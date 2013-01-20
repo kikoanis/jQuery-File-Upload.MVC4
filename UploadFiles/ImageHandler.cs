@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Drawing;
 using System.IO;
 using System.Web;
+using System.Web.Hosting;
 using System.Web.Routing;
 
 namespace UploadFiles
@@ -17,7 +18,9 @@ namespace UploadFiles
 
         public ImageHandler()
         {
-            _StorageRoot = Path.Combine(AppDomain.CurrentDomain.GetData("DataDirectory").ToString(), ConfigurationManager.AppSettings["DIR_FILE_UPLOADS"]);
+            _StorageRoot = Path.Combine(//AppDomain.CurrentDomain.GetData("DataDirectory").ToString(), 
+                HostingEnvironment.ApplicationPhysicalPath,  
+            ConfigurationManager.AppSettings["DIR_FILE_UPLOADS"]);
         }
 
         public void ProcessRequest(HttpContext context)
@@ -47,11 +50,11 @@ namespace UploadFiles
                 context.Response.ClearContent();
                 context.Response.ClearHeaders();
                 context.Response.AddHeader("Content-Length", file.Length.ToString());
-                context.Response.ContentType = MimeTypes.ImageMimeTypes[file.Extension];
+                context.Response.ContentType = MimeTypes.ImageMimeTypes[file.Extension.ToLower()];
                 context.Response.TransmitFile(file.FullName);
                 context.Response.Flush();
                 context.Response.Close();
-                context.Response.End();
+                //context.Response.End();
             }
             catch (Exception ex)
             {
